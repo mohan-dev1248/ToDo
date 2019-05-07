@@ -1,9 +1,12 @@
 package com.asura.todo
 
-import android.support.v7.widget.RecyclerView
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.task_item.view.*
 
 class TaskAdapter(private val taskList: List<Task>) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
@@ -17,10 +20,12 @@ class TaskAdapter(private val taskList: List<Task>) : RecyclerView.Adapter<TaskA
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        holder.taskName.text = taskList[position].getName()
+        holder.taskDescription.text = taskList[position].getDescription()
     }
 
     class TaskViewHolder(view:View) : RecyclerView.ViewHolder(view){
-
+        val taskName: TextView = view.taskName
+        val taskDescription: TextView = view.taskDescription
     }
 }

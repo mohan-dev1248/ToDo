@@ -4,6 +4,9 @@
     <string name="task_name">Task Name</string>
     <string name="your_task_name">your task name</string>
     <string name="task_description">Task Description</string>
-    <string name="your_description">your description</string>
+    <string name="your_description">your description(optional)</string>
     <string name="add_task">Add</string>
+    <string name="sample_name">sample task</string>
+    <string name="sample_description">sample_description</string>
+    <string name="empty_list">No ToDo Items</string>
 </resources>

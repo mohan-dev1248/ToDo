@@ -1,17 +1,16 @@
 package com.asura.todo
 
-import android.app.Dialog
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.task_input.*
 
 class TaskInputDialog: DialogFragment() {
 
     interface AddTaskListener{
-        fun addTask()
+        fun addTask(task: Task)
     }
 
     private lateinit var addTaskListener: AddTaskListener
@@ -40,6 +39,14 @@ class TaskInputDialog: DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        addTask.setOnClickListener { addTaskListener.addTask() }
+        addTask.setOnClickListener { onAddClick() }
+    }
+
+    private fun onAddClick(){
+        val taskName = taskNameInput.text.toString()
+        val taskDescription = taskDescriptionInput.text.toString()
+        if(taskName!=""){
+            addTaskListener.addTask(Task(taskName,taskDescription))
+        }
     }
 }

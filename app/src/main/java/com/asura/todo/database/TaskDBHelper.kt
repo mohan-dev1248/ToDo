@@ -11,8 +11,7 @@ private const val SQL_CREATE_ENTRIES =
     "CREATE TABLE ${TaskContract.TaskEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${TaskContract.TaskEntry.TASK_NAME} TEXT," +
-            "${TaskContract.TaskEntry.TASK_DESCRIPTION} TEXT," +
-            "${TaskContract.TaskEntry.TASK_DEADLINE} TEXT)"
+            "${TaskContract.TaskEntry.TASK_DESCRIPTION} TEXT)"
 
 private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${TaskContract.TaskEntry.TABLE_NAME}"
 
