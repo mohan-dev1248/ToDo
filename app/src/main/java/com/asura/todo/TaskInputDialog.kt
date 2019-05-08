@@ -29,12 +29,11 @@ class TaskInputDialog: DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.ThemeOverlay_Material_Dialog_Alert)
+        setStyle(STYLE_NORMAL, android.R.style.ThemeOverlay_Material_Dialog_Alert)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.task_input,container, false)
-        return view
+        return inflater.inflate(R.layout.task_input,container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
