@@ -4,8 +4,6 @@ import android.content.ContentValues
 import android.os.Bundle
 import android.provider.BaseColumns
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.asura.todo.database.TaskContract
@@ -24,7 +22,6 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
             askTaskDetails()
@@ -88,14 +85,12 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
         dialogFragment.show(supportFragmentManager, "Task Input Dialog")
     }
 
-    //ToDo - Need to Remove this and try to add directly to the database
     override fun addTask(task: Task) {
         Log.i(tag,"addTask() being called")
         dialogFragment.dismiss()
         addToDB(task)
     }
 
-    //ToDo - Need to Remove this and try to add directly to the database
     private fun addToDB(task: Task) {
         Log.i(tag, "addToDB() being called")
         val values = ContentValues()
@@ -107,18 +102,6 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
         db.insert(TaskContract.TaskEntry.TABLE_NAME, null, values)
         updateCoroutine(dbHelper).start()
         Log.i(tag, "Added to DB successfully")
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onDestroy() {
