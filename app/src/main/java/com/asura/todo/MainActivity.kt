@@ -12,7 +12,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.*
 
-class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
+class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
+    TaskAdapter.TaskItemClickListener{
 
     private val tag = "ToDoMainActivity"
 
@@ -55,9 +56,10 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
         )
         val taskList = mutableListOf<Task>()
         while(cursor.moveToNext()){
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID))
             val name = cursor.getString(cursor.getColumnIndexOrThrow(TaskContract.TaskEntry.TASK_NAME))
             val desc = cursor.getString(cursor.getColumnIndexOrThrow(TaskContract.TaskEntry.TASK_DESCRIPTION))
-            taskList.add(Task(name,desc))
+            taskList.add(Task(id,name,desc))
         }
         return taskList
     }
@@ -73,7 +75,7 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
 
         withContext(Dispatchers.Main){
             val list = deferred.await()
-            val taskAdapter = TaskAdapter(list)
+            val taskAdapter = TaskAdapter(list, this@MainActivity)
             //ToDo - need to check removeAndRecyclerExistingViews option and put appropriate boolean value
             taskRecyclerView.swapAdapter(taskAdapter,true)
             Log.i(tag,"After updating ")
@@ -102,6 +104,16 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener {
         db.insert(TaskContract.TaskEntry.TABLE_NAME, null, values)
         updateCoroutine(dbHelper).start()
         Log.i(tag, "Added to DB successfully")
+    }
+
+    override fun delete(task: Task) {
+        val db = dbHelper.writableDatabase
+        db.delete(
+            TaskContract.TaskEntry.TABLE_NAME,
+            BaseColumns._ID + " = ?",
+            arrayOf(task.getId().toString())
+            )
+        updateCoroutine(dbHelper).start()
     }
 
     override fun onDestroy() {

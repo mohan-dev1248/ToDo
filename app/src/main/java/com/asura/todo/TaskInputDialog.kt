@@ -45,7 +45,7 @@ class TaskInputDialog: DialogFragment() {
         val taskName = taskNameInput.text.toString()
         val taskDescription = taskDescriptionInput.text.toString()
         if(taskName!=""){
-            addTaskListener.addTask(Task(taskName,taskDescription))
+            addTaskListener.addTask(Task(name = taskName,description = taskDescription))
         }
     }
 }
