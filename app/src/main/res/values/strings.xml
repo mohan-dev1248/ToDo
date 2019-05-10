@@ -2,11 +2,11 @@
     <string name="app_name">ToDo</string>
     <string name="action_settings">Settings</string>
     <string name="task_name">Task Name</string>
-    <string name="your_task_name">your task name</string>
+    <string name="your_task_name">Name</string>
     <string name="task_description">Task Description</string>
-    <string name="your_description">your description(optional)</string>
+    <string name="your_description">Description</string>
     <string name="add_task">Add</string>
     <string name="sample_name">sample task</string>
     <string name="sample_description">sample_description</string>
-    <string name="empty_list">No ToDo Items</string>
+    <string name="empty_list">Your ToDo list is Empty</string>
 </resources>

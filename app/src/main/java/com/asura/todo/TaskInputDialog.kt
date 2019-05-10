@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.task_input.*
+import kotlinx.android.synthetic.main.task_input.taskDescription
+import kotlinx.android.synthetic.main.task_input.taskName
+import kotlinx.android.synthetic.main.task_item.*
 
 class TaskInputDialog: DialogFragment() {
 
@@ -39,11 +43,14 @@ class TaskInputDialog: DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         addTask.setOnClickListener { onAddClick() }
+
     }
 
+
+
     private fun onAddClick(){
-        val taskName = taskNameInput.text.toString()
-        val taskDescription = taskDescriptionInput.text.toString()
+        val taskName = taskName.text.toString()
+        val taskDescription = taskDescription.text.toString()
         if(taskName!=""){
             addTaskListener.addTask(Task(name = taskName,description = taskDescription))
         }
