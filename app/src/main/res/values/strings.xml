@@ -9,4 +9,5 @@
     <string name="sample_name">sample task</string>
     <string name="sample_description">sample_description</string>
     <string name="empty_list">Your ToDo list is Empty</string>
+    <string name="save">SAVE</string>
 </resources>

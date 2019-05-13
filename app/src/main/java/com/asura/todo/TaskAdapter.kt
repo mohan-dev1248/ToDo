@@ -46,7 +46,7 @@ class TaskAdapter(
             )
         }
         holder.itemView.setOnClickListener {
-
+            taskItemClickListener.onItemClick(taskList[position])
         }
     }
 

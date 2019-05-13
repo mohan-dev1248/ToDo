@@ -3,7 +3,6 @@ package com.asura.todo
 import android.content.ContentValues
 import android.os.Bundle
 import android.provider.BaseColumns
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
             null,
             null,
             null,
-            null,
+            BaseColumns._ID + " DESC",
             null
         )
         val taskList = mutableListOf<Task>()
@@ -94,7 +93,7 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
     }
 
     private fun askTaskDetails() {
-        dialogFragment = TaskInputDialog.newInstance(this)
+        dialogFragment = TaskInputDialog.newInstance(this, create)
         dialogFragment.show(supportFragmentManager, "Task Input Dialog")
     }
 
@@ -126,7 +125,6 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
     }
 
     override fun updateTaskCompleteStatus(taskId: Int, completeFlag: Boolean) {
-        Log.i(tag, "$taskId $completeFlag")
         val db = dbHelper.writableDatabase
         db.update(
             TaskContract.TaskEntry.TABLE_NAME,
@@ -139,7 +137,24 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
     }
 
     override fun onItemClick(task: Task) {
+        dialogFragment = TaskInputDialog.newInstance(this, edit)
+        dialogFragment.setTask(task)
+        dialogFragment.show(supportFragmentManager, "Task Input Dialog")
+    }
 
+    override fun editTask(taskId: Int, name: String, description: String) {
+        dialogFragment.dismiss()
+        val db = dbHelper.writableDatabase
+        db.update(
+            TaskContract.TaskEntry.TABLE_NAME,
+            ContentValues().apply {
+                put(TaskContract.TaskEntry.TASK_NAME, name)
+                put(TaskContract.TaskEntry.TASK_DESCRIPTION, description)
+            },
+            BaseColumns._ID + " = ?",
+            arrayOf(taskId.toString())
+        )
+        updateCoroutine(dbHelper).start()
     }
 
     override fun onDestroy() {
