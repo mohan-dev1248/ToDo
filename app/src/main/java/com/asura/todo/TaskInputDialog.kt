@@ -9,22 +9,22 @@ import kotlinx.android.synthetic.main.task_input.*
 
 
 
-class TaskInputDialog: DialogFragment() {
+class TaskInputDialog : DialogFragment() {
 
     private val create = 1
     private val edit = 2
 
-    private var mode:Int = create
-    private var task: Task?= null
+    private var mode: Int = create
+    private var task: Task? = null
 
-    interface AddTaskListener{
+    interface AddTaskListener {
         fun addTask(task: Task)
         fun editTask(taskId: Int, name: String, description: String)
     }
 
     private lateinit var addTaskListener: AddTaskListener
 
-    private fun TaskInputDialog(){
+    private fun TaskInputDialog() {
 
     }
 
@@ -43,34 +43,34 @@ class TaskInputDialog: DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.task_input,container, false)
+        return inflater.inflate(R.layout.task_input, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if(mode == create) {
+        if (mode == create) {
             addTask.setOnClickListener { onAddClick() }
         }
-        if (mode == edit){
-            taskName.setText( task!!.getName())
+        if (mode == edit) {
+            taskName.setText(task!!.getName())
             taskDescription.setText(task!!.getDescription())
             addTask.text = getText(R.string.save)
             addTask.setOnClickListener { onEditClick() }
         }
     }
 
-    private fun onAddClick(){
+    private fun onAddClick() {
         val taskName = taskName.text.toString()
         val taskDescription = taskDescription.text.toString()
-        if(taskName!=""){
-            addTaskListener.addTask(Task(name = taskName,description = taskDescription))
+        if (taskName != "") {
+            addTaskListener.addTask(Task(name = taskName, description = taskDescription))
         }
     }
 
-    private fun onEditClick(){
+    private fun onEditClick() {
         val taskName = taskName.text.toString()
         val taskDescription = taskDescription.text.toString()
-        if(taskName!=""){
+        if (taskName != "") {
             addTaskListener.editTask(task!!.getId(), taskName, taskDescription)
         }
     }

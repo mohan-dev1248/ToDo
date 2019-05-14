@@ -1,26 +1,20 @@
 package com.asura.todo
 
-import android.content.ContentValues
 import android.os.Bundle
-import android.provider.BaseColumns
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.asura.todo.database.TaskContract
 import com.asura.todo.database.TaskDBHelper
+import com.asura.todo.database.addTaskToDB
+import com.asura.todo.database.editTaskInDB
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
-    TaskAdapter.TaskItemClickListener {
+    TaskFragment.FragmentListener {
 
     private val tag = "ToDoMainActivity"
     private val create = 1
     private val edit = 2
 
     private lateinit var dialogFragment: TaskInputDialog
-    private lateinit var dbHelper: TaskDBHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,65 +25,9 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
             askTaskDetails()
         }
 
-        taskRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        dbHelper = TaskDBHelper(this)
-
-        updateCoroutine(dbHelper).start()
-    }
-
-    private fun fetchTasksFromDb(dbHelper: TaskDBHelper): List<Task> {
-        val db = dbHelper.readableDatabase
-        val projection: Array<String> = arrayOf(
-            //TODO - Here need to replace the BaseColumns._ID to TaskContract.TaskEntry._ID since TaskEntry implements BaseColumns
-            BaseColumns._ID,
-            TaskContract.TaskEntry.TASK_NAME,
-            TaskContract.TaskEntry.TASK_DESCRIPTION,
-            TaskContract.TaskEntry.TASK_COMPLETE_STATUS
-        )
-        val cursor = db.query(
-            TaskContract.TaskEntry.TABLE_NAME,
-            projection,
-            null,
-            null,
-            null,
-            null,
-            BaseColumns._ID + " DESC",
-            null
-        )
-        val taskList = mutableListOf<Task>()
-        while (cursor.moveToNext()) {
-            val id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID))
-            val name = cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.TASK_NAME))
-            val desc = cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.TASK_DESCRIPTION))
-            val comp = cursor.getInt(cursor.getColumnIndexOrThrow(TaskContract.TaskEntry.TASK_COMPLETE_STATUS))
-            taskList.add(Task(id, name, desc, comp == 1))
-        }
-        return taskList
-    }
-
-    private fun updateCoroutine(dbHelper: TaskDBHelper) = GlobalScope.launch {
-        updateList(dbHelper)
-    }
-
-    private suspend fun updateList(dbHelper: TaskDBHelper) {
-        val deferred = GlobalScope.async {
-            fetchTasksFromDb(dbHelper)
-        }
-
-        withContext(Dispatchers.Main) {
-            val list = deferred.await()
-            if (list.isNotEmpty()) {
-                emptyMessageTextView.visibility = View.INVISIBLE
-                taskRecyclerView.visibility = View.VISIBLE
-                val taskAdapter = TaskAdapter(list, this@MainActivity)
-                //ToDo - need to check removeAndRecyclerExistingViews option and put appropriate boolean value
-                taskRecyclerView.swapAdapter(taskAdapter, true)
-            } else {
-                emptyMessageTextView.visibility = View.VISIBLE
-                taskRecyclerView.visibility = View.INVISIBLE
-            }
-        }
+        viewPager.adapter = TaskPagerAdapter(supportFragmentManager,this)
+        viewPager.offscreenPageLimit = 3
+        tabLayout.setupWithViewPager(viewPager)
     }
 
     private fun askTaskDetails() {
@@ -99,41 +37,12 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
 
     override fun addTask(task: Task) {
         dialogFragment.dismiss()
-        addToDB(task)
+        addTaskToDB(TaskDBHelper(this),task)
+        viewPager.adapter?.notifyDataSetChanged()
     }
 
-    private fun addToDB(task: Task) {
-        val values = ContentValues()
-        values.apply {
-            put(TaskContract.TaskEntry.TASK_NAME, task.getName())
-            put(TaskContract.TaskEntry.TASK_DESCRIPTION, task.getDescription())
-            put(TaskContract.TaskEntry.TASK_COMPLETE_STATUS, 0)
-        }
-        val db = dbHelper.writableDatabase
-        db.insert(TaskContract.TaskEntry.TABLE_NAME, null, values)
-        updateCoroutine(dbHelper).start()
-    }
-
-    override fun delete(taskId: Int) {
-        val db = dbHelper.writableDatabase
-        db.delete(
-            TaskContract.TaskEntry.TABLE_NAME,
-            BaseColumns._ID + " = ?",
-            arrayOf(taskId.toString())
-        )
-        updateCoroutine(dbHelper).start()
-    }
-
-    override fun updateTaskCompleteStatus(taskId: Int, completeFlag: Boolean) {
-        val db = dbHelper.writableDatabase
-        db.update(
-            TaskContract.TaskEntry.TABLE_NAME,
-            ContentValues().apply {
-                put(TaskContract.TaskEntry.TASK_COMPLETE_STATUS, if(completeFlag) 1 else 0)
-            },
-            BaseColumns._ID + " = ?",
-            arrayOf(taskId.toString())
-        )
+    override fun notifyDataSetChanged() {
+        viewPager.adapter?.notifyDataSetChanged()
     }
 
     override fun onItemClick(task: Task) {
@@ -144,22 +53,7 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
 
     override fun editTask(taskId: Int, name: String, description: String) {
         dialogFragment.dismiss()
-        val db = dbHelper.writableDatabase
-        db.update(
-            TaskContract.TaskEntry.TABLE_NAME,
-            ContentValues().apply {
-                put(TaskContract.TaskEntry.TASK_NAME, name)
-                put(TaskContract.TaskEntry.TASK_DESCRIPTION, description)
-            },
-            BaseColumns._ID + " = ?",
-            arrayOf(taskId.toString())
-        )
-        updateCoroutine(dbHelper).start()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //ToDo - Need to check whether this actually cancels the coRoutine when the underlying task is huge
-        if (updateCoroutine(dbHelper).isActive) updateCoroutine(dbHelper).cancel()
+        editTaskInDB(TaskDBHelper(this),taskId,name,description)
+        viewPager.adapter?.notifyDataSetChanged()
     }
 }

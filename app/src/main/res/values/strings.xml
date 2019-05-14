@@ -10,4 +10,7 @@
     <string name="sample_description">sample_description</string>
     <string name="empty_list">Your ToDo list is Empty</string>
     <string name="save">SAVE</string>
+    <string name="all">ALL</string>
+    <string name="completed">COMPLETED</string>
+    <string name="incomplete">INCOMPLETE</string>
 </resources>
