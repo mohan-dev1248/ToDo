@@ -38,11 +38,11 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
     override fun addTask(task: Task) {
         dialogFragment.dismiss()
         addTaskToDB(TaskDBHelper(this),task)
-        viewPager.adapter?.notifyDataSetChanged()
+        notifyDataSetChanged()
     }
 
     override fun notifyDataSetChanged() {
-        viewPager.adapter?.notifyDataSetChanged()
+        (viewPager.adapter as TaskPagerAdapter).updateRecyclerView()
     }
 
     override fun onItemClick(task: Task) {
@@ -54,6 +54,6 @@ class MainActivity : AppCompatActivity(), TaskInputDialog.AddTaskListener,
     override fun editTask(taskId: Int, name: String, description: String) {
         dialogFragment.dismiss()
         editTaskInDB(TaskDBHelper(this),taskId,name,description)
-        viewPager.adapter?.notifyDataSetChanged()
+        notifyDataSetChanged()
     }
 }

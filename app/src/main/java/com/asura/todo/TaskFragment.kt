@@ -45,12 +45,7 @@ class TaskFragment : Fragment(), TaskAdapter.TaskItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         taskRecyclerView.layoutManager = LinearLayoutManager(activity)
         dbHelper = TaskDBHelper(activity as Context)
-        when (completeStatus) {
-            COMPLETED -> updateCoroutine(dbHelper, 1){ list -> updateCallback(list)}.start()
-            INCOMPLETE -> updateCoroutine(dbHelper, 0){ list -> updateCallback(list)}.start()
-            ALL -> updateCoroutine(dbHelper, null){ list -> updateCallback(list)}.start()
-        }
-
+        updateList()
     }
 
     private fun updateCallback(list:List<Task>) {
@@ -78,6 +73,14 @@ class TaskFragment : Fragment(), TaskAdapter.TaskItemClickListener {
     override fun updateTaskCompleteStatus(taskId: Int, completeFlag: Boolean) {
         updateTaskCompleteStatusInDB(dbHelper, taskId, completeFlag)
         fragmentListener.notifyDataSetChanged()
+    }
+
+    fun updateList() {
+        when (completeStatus) {
+            COMPLETED -> updateCoroutine(dbHelper, 1){ list -> updateCallback(list)}.start()
+            INCOMPLETE -> updateCoroutine(dbHelper, 0){ list -> updateCallback(list)}.start()
+            ALL -> updateCoroutine(dbHelper, null){ list -> updateCallback(list)}.start()
+        }
     }
 
     companion object {
